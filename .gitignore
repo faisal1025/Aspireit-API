@@ -1,0 +1,4 @@
+env
+user/__pycache__
+user/migrations/__pycache__
+it_API/__pycache__
