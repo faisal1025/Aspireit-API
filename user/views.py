@@ -1,12 +1,15 @@
 from rest_framework.response import Response
-from rest_framework.decorators import api_view, permission_classes
+from rest_framework.decorators import api_view, permission_classes, parser_classes
 from rest_framework.permissions import IsAuthenticated
-from .serializer import RegisterSerializer, LoginSerializer, UserSerializer, UserEditSerializer
+from rest_framework.parsers import MultiPartParser, FormParser
+from .serializer import RegisterSerializer, LoginSerializer, UserSerializer, UserEditSerializer, FileSerializer
 from rest_framework import status
 from rest_framework_simplejwt.tokens import RefreshToken
 from django.contrib.auth import authenticate
 from django.contrib.auth.models import User
 from transformers import pipeline
+from .models import FileModel
+from django.http import FileResponse
 
 def get_tokens_for_user(user):
     refresh = RefreshToken.for_user(user)
@@ -80,7 +83,7 @@ def login(request):
 def dashboard(request): 
     try:
         username = request.query_params['username']
-        user = User.objects.get(username=username)  # Query the user by username
+        user = User.objects.prefetch_related('files').get(username=username)  # Query the user by username
     except User.DoesNotExist:
         return Response({'error': 'User not found'}, status=status.HTTP_404_NOT_FOUND)
 
@@ -134,3 +137,30 @@ def analyze(request):
     except Exception as e:
         print(e)
 
+@api_view(['POST'])
+@permission_classes([IsAuthenticated])
+@parser_classes([MultiPartParser, FormParser])
+def upload(request): 
+    try:
+        serializer = FileSerializer(data=request.data)
+        if serializer.is_valid():
+            data = serializer.save(request.user)
+            return Response({'message': "File uploaded successfully", 'data': data.description})
+        else:
+            return Response({'Error': serializer.errors})
+    except Exception as e:
+        print(e)
+
+
+@api_view(['GET'])
+@permission_classes([IsAuthenticated])
+def download(request): 
+    try:
+        fileId = request.query_params['id']
+        file = FileModel.objects.get(id = fileId)
+        filehandle = file.file.open()
+        response = FileResponse(filehandle, as_attachment=True, filename=file.file.name)
+        response['Content-Length'] = file.file.size
+        return response
+    except FileModel.DoesNotExist:
+        return Response({'status': 404, 'message': "file not found"})

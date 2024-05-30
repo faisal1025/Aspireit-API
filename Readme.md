@@ -22,11 +22,17 @@ For creating the text analyzer I have used huggingface package transformers. Thi
 - For the second argument ML model, I haven't specified any thing so it will use the default one.
 - tokenizer is incharge of mapping the text to tokens so that ML model can understand. In this case I also not specified so it is using default one.
 
+## File Upload (pdf, image, mp3)
+I have also created a file upload system only for authenticated user. On that user dashboard his files can be seen what ever file he has uploaded and he can also see that file content online as well as download that file. I have used FileResponse for sending file from API to client.
+
+Note: We should always serve files in chunks in streams. so that there would be less load on server but these files are small in size so, I have fetch the file directly, Here
+
 ## Database 
 
 For database in this project I have used mongodb, I have connect it using external package djongo and created a cluster in mongobd cloud that can be accessble from any where. so that you no need to setup any thing for database
 
 account I have created: username - fai12, password - Kali@fa12
+admin account credentials: username - faisa, password - faiSAL@12
 
 ## Setup in Local
 

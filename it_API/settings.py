@@ -9,7 +9,7 @@ https://docs.djangoproject.com/en/5.0/topics/settings/
 For the full list of settings and their values, see
 https://docs.djangoproject.com/en/5.0/ref/settings/
 """
-
+import os
 from pathlib import Path
 from datetime import timedelta
 
@@ -27,6 +27,10 @@ SECRET_KEY = 'django-insecure-wx_^!@@a2sp^u!(g1br5k4c@s43^2=p=!cim9yp)-p=p72@z@f
 DEBUG = True
 
 ALLOWED_HOSTS = []
+
+MEDIA_ROOT = os.path.join(os.path.dirname(BASE_DIR), 'mediafiles')
+MEDIA_URL = '/media/'
+
 
 # Application definition
 
